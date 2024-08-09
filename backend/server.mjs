@@ -6,30 +6,40 @@ import users from "./routes/user.mjs";
 import cors from "cors";
 import express from "express";
 
+// Define your allowed origins
+const allowedOrigins = ['*'];
+
 const port = 3001;
 
+// CORS configuration
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true // If you need to support cookies or authorization headers
+};
+
+// Apply CORS middleware with the configured options
+app.use(cors(corsOptions));
+app.use(express.json());
+
+// Register the routes
+app.use("/post", posts);
+app.use("/user", users);
+
+// Create the HTTPS server with the provided options
 const options = {
     key: fs.readFileSync('keys/privatekey.pem'),
     cert: fs.readFileSync('keys/certificate.pem')
 };
 
-app.use(cors());
-app.use(express.json());
-
-app.use((req, res, next) => {
-    res.writeHead(200, { 'Access-Control-Allow-Origin': '*' }); // Sensitive
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    res.setHeader('Access-Control-Allow-Methods', '*');
-    next();
-});
-
-// Register the routes
-app.use("/post", posts);
-app.route("/post", posts);
-app.use("/user", users);
-app.route("/user", users);
-
-// Create the HTTPS server with the provided options
 let server = https.createServer(options, app);
 
 console.log(`Server running on port ${port}`);
