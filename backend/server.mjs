@@ -2,6 +2,7 @@ import https from 'https';
 import fs from 'fs';
 import app from './app.mjs';
 import posts from "./routes/post.mjs";
+import users from "./routes/user.mjs";
 import cors from "cors";
 import express from "express";
 
@@ -25,6 +26,8 @@ app.use((req, res, next) => {
 // Register the routes
 app.use("/post", posts);
 app.route("/post", posts);
+app.use("/user", users);
+app.route("/user", users);
 
 // Create the HTTPS server with the provided options
 let server = https.createServer(options, app);
