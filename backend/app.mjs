@@ -4,19 +4,19 @@ import express from "express";
 const app = express();
 const urlPrefix = '/api';
 
-let example = app;
+app.disable('x-powered-by');
 
-example.use(express.json());
+app.use(express.json());
 
-example.get(urlPrefix+'/', (req,res) => {
+app.get(urlPrefix+'/', (req,res) => {
     res.end("It's working, no more crying.");
 });
 
-example.get(urlPrefix+'/test', (req,res) => {
+app.get(urlPrefix+'/test', (req,res) => {
     res.end("Testing the /test endpoint.");
 });
 
-example.get(urlPrefix+'/orders', (req,res) => {
+app.get(urlPrefix+'/orders', (req,res) => {
     const orders = [
         {
             id: "1",
