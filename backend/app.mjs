@@ -4,17 +4,19 @@ import express from "express";
 const app = express();
 const urlPrefix = '/api';
 
-app.use(express.json());
+let example = app;
 
-app.get(urlPrefix+'/', (req,res) => {
+example.use(express.json());
+
+example.get(urlPrefix+'/', (req,res) => {
     res.end("It's working, no more crying.");
 });
 
-app.get(urlPrefix+'/test', (req,res) => {
+example.get(urlPrefix+'/test', (req,res) => {
     res.end("Testing the /test endpoint.");
 });
 
-app.get(urlPrefix+'/orders', (req,res) => {
+example.get(urlPrefix+'/orders', (req,res) => {
     const orders = [
         {
             id: "1",
