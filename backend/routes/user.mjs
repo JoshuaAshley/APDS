@@ -10,19 +10,36 @@ const router = express.Router();
 // var store = ExpressBrute.MemoryStore();
 // var bruteForce = new ExpressBrute(store);
 
-router.post("/signup", async (req,res) => {
-    const password = bcrypt.hash(req.body.password, 10)
-    let newDocument = {
-        name: req.body.name,
-        password: (await password).toString()
-    };
-    let collection = await db.collection("users");
-    let result = await collection.insertOne(newDocument);
+router.post("/signup", async (req, res) => {
+    try {
+        const collection = await db.collection("users");
 
-    console.log(password);
+        // Check if a user with the same name already exists
+        const existingUser = await collection.findOne({ name: req.body.name });
 
-    res.send(result).status(200);
-})
+        if (existingUser) {
+            return res.status(400).json({ message: "Username already exists" });
+        }
+
+        // Hash the password
+        const password = await bcrypt.hash(req.body.password, 10);
+
+        // Create a new user document
+        let newDocument = {
+            name: req.body.name,
+            password: password // No need to use .toString()
+        };
+
+        // Insert the new user into the collection
+        let result = await collection.insertOne(newDocument);
+
+        // Send back the result with a success status
+        res.status(200).json({ message: "User registered successfully", result });
+    } catch (error) {
+        console.error("Error during signup:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
 
 router.post('/login', async (req, res) => {
     const { name, password } = req.body;
